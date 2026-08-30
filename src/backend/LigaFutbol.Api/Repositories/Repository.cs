@@ -9,9 +9,9 @@ public class Repository<TEntity>(LigaFutbolDbContext context) : IRepository<TEnt
     protected readonly LigaFutbolDbContext Context = context;
     protected readonly DbSet<TEntity> DbSet = context.Set<TEntity>();
 
-    public async Task<IEnumerable<TEntity>> GetAllAsync() => await DbSet.ToListAsync();
+    public virtual async Task<IEnumerable<TEntity>> GetAllAsync() => await DbSet.ToListAsync();
 
-    public async Task<TEntity?> GetByIdAsync(int id) => await DbSet.FindAsync(id);
+    public virtual async Task<TEntity?> GetByIdAsync(int id) => await DbSet.FindAsync(id);
 
     public async Task<TEntity> AddAsync(TEntity entity)
     {
