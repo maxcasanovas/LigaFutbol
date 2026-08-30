@@ -4,6 +4,7 @@ using LigaFutbol.Api.Repositories.Interfaces;
 using LigaFutbol.Api.Services;
 using LigaFutbol.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.Title = "LigaFutbol API";
+    });
 }
 
 app.UseHttpsRedirection();

@@ -19,7 +19,7 @@ public class PaisesController(IPaisService paisService) : ControllerBase
         return pais is null ? NotFound() : Ok(pais);
     }
 
-     [HttpGet("{nombre:string}")]
+    [HttpGet("nombre/{nombre}")]
     public async Task<ActionResult<PaisDto>> GetByName(string nombre)
     {
         var pais = await paisService.GetByNombreAsync(nombre);
