@@ -14,6 +14,7 @@ public class LigaFutbolDbContext(DbContextOptions<LigaFutbolDbContext> options) 
         modelBuilder.Entity<Pais>(entity =>
         {
             entity.Property(p => p.Nombre).IsRequired().HasMaxLength(150);
+            entity.Property(p => p.UrlBandera).IsRequired().HasMaxLength(500);
         });
 
         modelBuilder.Entity<Ciudad>(entity =>
@@ -29,6 +30,7 @@ public class LigaFutbolDbContext(DbContextOptions<LigaFutbolDbContext> options) 
         modelBuilder.Entity<Equipo>(entity =>
         {
             entity.Property(e => e.Nombre).IsRequired().HasMaxLength(150);
+            entity.Property(e => e.UrlEscudo).IsRequired().HasMaxLength(500);
 
             entity.HasOne(e => e.Ciudad)
                 .WithMany(c => c.Equipos)
