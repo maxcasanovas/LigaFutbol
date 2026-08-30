@@ -18,6 +18,10 @@ builder.Services.AddDbContext<LigaFutbolDbContext>(options =>
 
 builder.Services.AddScoped<IEquipoRepository, EquipoRepository>();
 builder.Services.AddScoped<IEquipoService, EquipoService>();
+builder.Services.AddScoped<IPaisRepository, PaisRepository>();
+builder.Services.AddScoped<IPaisService, PaisService>();
+builder.Services.AddScoped<ICiudadRepository, CiudadRepository>();
+builder.Services.AddScoped<ICiudadService, CiudadService>();
 
 var app = builder.Build();
 
