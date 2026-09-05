@@ -79,7 +79,9 @@ export function EquiposPage() {
           {equipos.data?.map((equipo) => (
             <Table.Tr key={equipo.id}>
               <Table.Td w={40}>
-                <Avatar src={equipo.urlEscudo} size="sm" radius="xs" />
+                <Avatar src={equipo.urlEscudo || null} size="sm" radius="xs">
+                  🛡
+                </Avatar>
               </Table.Td>
               <Table.Td>{equipo.nombre}</Table.Td>
               <Table.Td>{equipo.ciudad}</Table.Td>

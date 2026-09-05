@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Alert, Button, Group, Modal, Select, Stack, TextInput } from '@mantine/core';
+import { Alert, Avatar, Button, Group, Modal, Select, Stack, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { ApiError } from '../../api/errors';
 import { useCiudades, useLigas } from '../../api/queries';
 import type { EquipoDto } from '../../api/types';
 import { useCreateEquipo, useUpdateEquipo } from './mutations';
+import { TeamBadgeSearch } from './TeamBadgeSearch';
 
 interface EquipoFormValues {
   nombre: string;
@@ -94,11 +95,23 @@ export function EquipoFormModal({ opened, onClose, equipo }: EquipoFormModalProp
             </Alert>
           )}
           <TextInput label="Nombre" placeholder="Boca Juniors" {...form.getInputProps('nombre')} />
-          <TextInput
-            label="URL del escudo"
-            placeholder="https://x.com/boca.png"
-            {...form.getInputProps('urlEscudo')}
+
+          <TeamBadgeSearch
+            nombre={form.values.nombre}
+            onSelect={(urlEscudo) => form.setFieldValue('urlEscudo', urlEscudo)}
           />
+
+          <Group align="flex-end" gap="xs" wrap="nowrap">
+            <TextInput
+              label="URL del escudo"
+              placeholder="https://x.com/boca.png"
+              style={{ flex: 1 }}
+              {...form.getInputProps('urlEscudo')}
+            />
+            <Avatar src={form.values.urlEscudo || null} size="lg" radius="xs">
+              🛡
+            </Avatar>
+          </Group>
           <Select
             label="Ciudad"
             placeholder="Seleccioná una ciudad"
