@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Alert, Button, Group, Modal, Stack, TextInput } from '@mantine/core';
+import { Alert, Avatar, Button, Group, Modal, Stack, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { ApiError } from '../../api/errors';
 import type { PaisDto } from '../../api/types';
 import { useCreatePais, useUpdatePais, type PaisFormValues } from './mutations';
+import { CountryFlagSearch } from './CountryFlagSearch';
 
 interface PaisFormModalProps {
   opened: boolean;
@@ -58,11 +59,23 @@ export function PaisFormModal({ opened, onClose, pais }: PaisFormModalProps) {
             </Alert>
           )}
           <TextInput label="Nombre" placeholder="Argentina" {...form.getInputProps('nombre')} />
-          <TextInput
-            label="URL de la bandera"
-            placeholder="https://flagcdn.com/ar.svg"
-            {...form.getInputProps('urlBandera')}
+
+          <CountryFlagSearch
+            nombre={form.values.nombre}
+            onSelect={(urlBandera) => form.setFieldValue('urlBandera', urlBandera)}
           />
+
+          <Group align="flex-end" gap="xs" wrap="nowrap">
+            <TextInput
+              label="URL de la bandera"
+              placeholder="https://flagcdn.com/ar.svg"
+              style={{ flex: 1 }}
+              {...form.getInputProps('urlBandera')}
+            />
+            <Avatar src={form.values.urlBandera || null} size="lg" radius="xs">
+              🏳
+            </Avatar>
+          </Group>
           <Group justify="flex-end" mt="xs">
             <Button variant="default" type="button" onClick={onClose}>
               Cancelar
