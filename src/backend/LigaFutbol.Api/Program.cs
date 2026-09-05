@@ -92,4 +92,26 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Si la tabla de usuarios esta vacia, crea el primer Admin a partir de la config
+// (necesario porque el autoregistro publico solo permite el rol Lector).
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<LigaFutbolDbContext>();
+    var seedConfig = app.Configuration.GetSection("Seed");
+    var adminEmail = seedConfig["AdminEmail"];
+    var adminPassword = seedConfig["AdminPassword"];
+
+    if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword)
+        && !await context.Usuarios.AnyAsync())
+    {
+        context.Usuarios.Add(new Usuario
+        {
+            Email = adminEmail,
+            PasswordHash = PasswordHasher.Hash(adminPassword),
+            Rol = RolUsuario.Admin
+        });
+        await context.SaveChangesAsync();
+    }
+}
+
 app.Run();
