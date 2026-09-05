@@ -8,6 +8,7 @@ import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import './index.css';
 import { theme } from './theme/theme';
+import { AuthProvider } from './auth/AuthContext';
 import App from './App.tsx';
 
 const queryClient = new QueryClient();
@@ -18,7 +19,9 @@ createRoot(document.getElementById('root')!).render(
       <MantineProvider theme={theme}>
         <Notifications />
         <BrowserRouter>
-          <App />
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </BrowserRouter>
       </MantineProvider>
     </QueryClientProvider>
