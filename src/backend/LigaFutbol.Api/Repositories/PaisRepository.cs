@@ -8,11 +8,11 @@ namespace LigaFutbol.Api.Repositories;
 public class PaisRepository(LigaFutbolDbContext context) : Repository<Pais>(context), IPaisRepository
 {
     public override async Task<IEnumerable<Pais>> GetAllAsync() =>
-        await DbSet.Include(p => p.Ciudades).ToListAsync();
+        await DbSet.Include(p => p.Ciudades).Include(p => p.Ligas).ToListAsync();
 
     public override async Task<Pais?> GetByIdAsync(int id) =>
-        await DbSet.Include(p => p.Ciudades).FirstOrDefaultAsync(p => p.Id == id);
+        await DbSet.Include(p => p.Ciudades).Include(p => p.Ligas).FirstOrDefaultAsync(p => p.Id == id);
 
     public async Task<Pais?> GetByNombreAsync(string nombre) =>
-        await DbSet.Include(p => p.Ciudades).FirstOrDefaultAsync(p => p.Nombre == nombre);
+        await DbSet.Include(p => p.Ciudades).Include(p => p.Ligas).FirstOrDefaultAsync(p => p.Nombre == nombre);
 }

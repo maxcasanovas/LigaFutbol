@@ -17,6 +17,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+const string DevCorsPolicy = "DevCors";
+
+// Politica de CORS solo para desarrollo: permite que un frontend corriendo en cualquier
+// origen local (Vite, CRA, etc.) consuma la API. Antes de un deploy real, reemplazar por
+// una policy que liste explicitamente el/los origenes de produccion del frontend.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(DevCorsPolicy, policy =>
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+});
+
 builder.Services.AddControllers(options =>
 {
     // Convierte los tokens [controller]/[action] a snake_case (ej: MiRecurso -> mi_recurso)
@@ -86,6 +97,7 @@ if (app.Environment.IsDevelopment())
     {
         options.Title = "LigaFutbol API";
     });
+    app.UseCors(DevCorsPolicy);
 }
 
 app.UseHttpsRedirection();

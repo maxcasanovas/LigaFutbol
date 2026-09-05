@@ -1,3 +1,4 @@
+using LigaFutbol.Api.Exceptions;
 using LigaFutbol.Api.Models.DTOs;
 using LigaFutbol.Api.Security;
 using LigaFutbol.Api.Services.Interfaces;
@@ -27,23 +28,44 @@ public class CiudadesController(ICiudadService ciudadService) : ControllerBase
     [Authorize(Policy = Policies.Escritura)]
     public async Task<ActionResult<CiudadDto>> Create(CrearCiudadDto dto)
     {
-        var ciudad = await ciudadService.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = ciudad.Id }, ciudad);
+        try
+        {
+            var ciudad = await ciudadService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = ciudad.Id }, ciudad);
+        }
+        catch (BusinessRuleException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id:int}")]
     [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Update(int id, ActualizarCiudadDto dto)
     {
-        var actualizado = await ciudadService.UpdateAsync(id, dto);
-        return actualizado ? NoContent() : NotFound();
+        try
+        {
+            var actualizado = await ciudadService.UpdateAsync(id, dto);
+            return actualizado ? NoContent() : NotFound();
+        }
+        catch (BusinessRuleException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("{id:int}")]
     [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Delete(int id)
     {
-        var eliminado = await ciudadService.DeleteAsync(id);
-        return eliminado ? NoContent() : NotFound();
+        try
+        {
+            var eliminado = await ciudadService.DeleteAsync(id);
+            return eliminado ? NoContent() : NotFound();
+        }
+        catch (BusinessRuleException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }
