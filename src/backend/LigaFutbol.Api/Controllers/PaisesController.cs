@@ -1,5 +1,7 @@
 using LigaFutbol.Api.Models.DTOs;
+using LigaFutbol.Api.Security;
 using LigaFutbol.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LigaFutbol.Api.Controllers;
@@ -9,10 +11,12 @@ namespace LigaFutbol.Api.Controllers;
 public class PaisesController(IPaisService paisService) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy = Policies.Lectura)]
     public async Task<ActionResult<IEnumerable<PaisDto>>> GetAll() =>
         Ok(await paisService.GetAllAsync());
 
     [HttpGet("{id:int}")]
+    [Authorize(Policy = Policies.Lectura)]
     public async Task<ActionResult<PaisDto>> GetById(int id)
     {
         var pais = await paisService.GetByIdAsync(id);
@@ -20,6 +24,7 @@ public class PaisesController(IPaisService paisService) : ControllerBase
     }
 
     [HttpGet("nombre/{nombre}")]
+    [Authorize(Policy = Policies.Lectura)]
     public async Task<ActionResult<PaisDto>> GetByName(string nombre)
     {
         var pais = await paisService.GetByNombreAsync(nombre);
@@ -27,6 +32,7 @@ public class PaisesController(IPaisService paisService) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = Policies.Escritura)]
     public async Task<ActionResult<PaisDto>> Create(CrearPaisDto dto)
     {
         var pais = await paisService.CreateAsync(dto);
@@ -34,6 +40,7 @@ public class PaisesController(IPaisService paisService) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Update(int id, ActualizarPaisDto dto)
     {
         var actualizado = await paisService.UpdateAsync(id, dto);
@@ -41,6 +48,7 @@ public class PaisesController(IPaisService paisService) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Delete(int id)
     {
         var eliminado = await paisService.DeleteAsync(id);

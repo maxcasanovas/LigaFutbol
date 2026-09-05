@@ -1,5 +1,7 @@
 using LigaFutbol.Api.Models.DTOs;
+using LigaFutbol.Api.Security;
 using LigaFutbol.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LigaFutbol.Api.Controllers;
@@ -9,10 +11,12 @@ namespace LigaFutbol.Api.Controllers;
 public class CiudadesController(ICiudadService ciudadService) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy = Policies.Lectura)]
     public async Task<ActionResult<IEnumerable<CiudadDto>>> GetAll() =>
         Ok(await ciudadService.GetAllAsync());
 
     [HttpGet("{id:int}")]
+    [Authorize(Policy = Policies.Lectura)]
     public async Task<ActionResult<CiudadDto>> GetById(int id)
     {
         var ciudad = await ciudadService.GetByIdAsync(id);
@@ -20,6 +24,7 @@ public class CiudadesController(ICiudadService ciudadService) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = Policies.Escritura)]
     public async Task<ActionResult<CiudadDto>> Create(CrearCiudadDto dto)
     {
         var ciudad = await ciudadService.CreateAsync(dto);
@@ -27,6 +32,7 @@ public class CiudadesController(ICiudadService ciudadService) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Update(int id, ActualizarCiudadDto dto)
     {
         var actualizado = await ciudadService.UpdateAsync(id, dto);
@@ -34,6 +40,7 @@ public class CiudadesController(ICiudadService ciudadService) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Delete(int id)
     {
         var eliminado = await ciudadService.DeleteAsync(id);

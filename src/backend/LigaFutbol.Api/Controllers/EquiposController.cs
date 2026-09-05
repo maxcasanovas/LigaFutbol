@@ -1,5 +1,7 @@
 using LigaFutbol.Api.Models.DTOs;
+using LigaFutbol.Api.Security;
 using LigaFutbol.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LigaFutbol.Api.Controllers;
@@ -9,10 +11,12 @@ namespace LigaFutbol.Api.Controllers;
 public class EquiposController(IEquipoService equipoService) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy = Policies.Lectura)]
     public async Task<ActionResult<IEnumerable<EquipoDto>>> GetAll() =>
         Ok(await equipoService.GetAllAsync());
 
     [HttpGet("{id:int}")]
+    [Authorize(Policy = Policies.Lectura)]
     public async Task<ActionResult<EquipoDto>> GetById(int id)
     {
         var equipo = await equipoService.GetByIdAsync(id);
@@ -20,6 +24,7 @@ public class EquiposController(IEquipoService equipoService) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = Policies.Escritura)]
     public async Task<ActionResult<EquipoDto>> Create(CrearEquipoDto dto)
     {
         var equipo = await equipoService.CreateAsync(dto);
@@ -27,6 +32,7 @@ public class EquiposController(IEquipoService equipoService) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Update(int id, ActualizarEquipoDto dto)
     {
         var actualizado = await equipoService.UpdateAsync(id, dto);
@@ -34,6 +40,7 @@ public class EquiposController(IEquipoService equipoService) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Delete(int id)
     {
         var eliminado = await equipoService.DeleteAsync(id);

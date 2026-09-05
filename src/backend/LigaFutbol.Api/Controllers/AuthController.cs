@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using LigaFutbol.Api.Exceptions;
 using LigaFutbol.Api.Models.DTOs;
+using LigaFutbol.Api.Security;
 using LigaFutbol.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,21 @@ public class AuthController(IAuthService authService) : ControllerBase
         try
         {
             var resultado = await authService.RegistrarAsync(dto);
+            return Ok(resultado);
+        }
+        catch (BusinessRuleException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("usuarios")]
+    [Authorize(Policy = Policies.GestionUsuarios)]
+    public async Task<ActionResult<AuthResponseDto>> CrearUsuario(RegistrarUsuarioDto dto)
+    {
+        try
+        {
+            var resultado = await authService.CrearUsuarioAsync(dto);
             return Ok(resultado);
         }
         catch (BusinessRuleException ex)
