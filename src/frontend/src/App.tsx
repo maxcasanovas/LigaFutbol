@@ -7,7 +7,7 @@ import { PaisesPage } from './pages/PaisesPage';
 import { CiudadesPage } from './pages/CiudadesPage';
 import { LigasPage } from './pages/LigasPage';
 import { EquiposPage } from './pages/EquiposPage';
-import { PlaceholderPage } from './pages/PlaceholderPage';
+import { GestionUsuariosPage } from './pages/GestionUsuariosPage';
 
 function App() {
   return (
@@ -20,7 +20,9 @@ function App() {
           <Route path="/ciudades" element={<CiudadesPage />} />
           <Route path="/ligas" element={<LigasPage />} />
           <Route path="/equipos" element={<EquiposPage />} />
-          <Route path="/usuarios" element={<PlaceholderPage title="Usuarios" />} />
+          <Route element={<ProtectedRoute roles={['Admin']} />}>
+            <Route path="/usuarios" element={<GestionUsuariosPage />} />
+          </Route>
         </Route>
       </Route>
     </Routes>

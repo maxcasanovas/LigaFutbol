@@ -12,6 +12,12 @@ export interface AuthResponseDto {
   rol: Rol;
 }
 
+export interface CrearUsuarioDto {
+  email: string;
+  password: string;
+  rol: Rol;
+}
+
 export interface CiudadResumenDto {
   id: number;
   nombre: string;
