@@ -37,6 +37,7 @@ builder.Services.AddScoped<IPaisRepository, PaisRepository>();
 builder.Services.AddScoped<IPaisService, PaisService>();
 builder.Services.AddScoped<ICiudadRepository, CiudadRepository>();
 builder.Services.AddScoped<ICiudadService, CiudadService>();
+builder.Services.AddScoped<ILigaRepository, LigaRepository>();
 
 var app = builder.Build();
 

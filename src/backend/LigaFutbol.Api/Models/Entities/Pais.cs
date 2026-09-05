@@ -7,4 +7,5 @@ public class Pais
     public string UrlBandera { get; set; } = string.Empty;
 
     public ICollection<Ciudad> Ciudades { get; set; } = [];
+    public ICollection<Liga> Ligas { get; set; } = [];
 }

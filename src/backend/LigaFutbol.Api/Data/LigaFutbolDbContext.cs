@@ -7,6 +7,7 @@ public class LigaFutbolDbContext(DbContextOptions<LigaFutbolDbContext> options) 
 {
     public DbSet<Pais> Paises => Set<Pais>();
     public DbSet<Ciudad> Ciudades => Set<Ciudad>();
+    public DbSet<Liga> Ligas => Set<Liga>();
     public DbSet<Equipo> Equipos => Set<Equipo>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,6 +28,16 @@ public class LigaFutbolDbContext(DbContextOptions<LigaFutbolDbContext> options) 
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
+        modelBuilder.Entity<Liga>(entity =>
+        {
+            entity.Property(l => l.Nombre).IsRequired().HasMaxLength(150);
+
+            entity.HasOne(l => l.Pais)
+                .WithMany(p => p.Ligas)
+                .HasForeignKey(l => l.PaisId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
         modelBuilder.Entity<Equipo>(entity =>
         {
             entity.Property(e => e.Nombre).IsRequired().HasMaxLength(150);
@@ -35,6 +46,11 @@ public class LigaFutbolDbContext(DbContextOptions<LigaFutbolDbContext> options) 
             entity.HasOne(e => e.Ciudad)
                 .WithMany(c => c.Equipos)
                 .HasForeignKey(e => e.CiudadId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Liga)
+                .WithMany(l => l.Equipos)
+                .HasForeignKey(e => e.LigaId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
