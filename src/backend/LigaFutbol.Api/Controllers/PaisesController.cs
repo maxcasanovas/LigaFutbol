@@ -1,3 +1,4 @@
+using LigaFutbol.Api.Exceptions;
 using LigaFutbol.Api.Models.DTOs;
 using LigaFutbol.Api.Security;
 using LigaFutbol.Api.Services.Interfaces;
@@ -35,23 +36,44 @@ public class PaisesController(IPaisService paisService) : ControllerBase
     [Authorize(Policy = Policies.Escritura)]
     public async Task<ActionResult<PaisDto>> Create(CrearPaisDto dto)
     {
-        var pais = await paisService.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = pais.Id }, pais);
+        try
+        {
+            var pais = await paisService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = pais.Id }, pais);
+        }
+        catch (BusinessRuleException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id:int}")]
     [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Update(int id, ActualizarPaisDto dto)
     {
-        var actualizado = await paisService.UpdateAsync(id, dto);
-        return actualizado ? NoContent() : NotFound();
+        try
+        {
+            var actualizado = await paisService.UpdateAsync(id, dto);
+            return actualizado ? NoContent() : NotFound();
+        }
+        catch (BusinessRuleException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("{id:int}")]
     [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Delete(int id)
     {
-        var eliminado = await paisService.DeleteAsync(id);
-        return eliminado ? NoContent() : NotFound();
+        try
+        {
+            var eliminado = await paisService.DeleteAsync(id);
+            return eliminado ? NoContent() : NotFound();
+        }
+        catch (BusinessRuleException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }
