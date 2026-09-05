@@ -43,6 +43,7 @@ builder.Services.AddScoped<IPaisService, PaisService>();
 builder.Services.AddScoped<ICiudadRepository, CiudadRepository>();
 builder.Services.AddScoped<ICiudadService, CiudadService>();
 builder.Services.AddScoped<ILigaRepository, LigaRepository>();
+builder.Services.AddScoped<ILigaService, LigaService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<JwtTokenGenerator>();
