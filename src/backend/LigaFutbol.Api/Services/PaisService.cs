@@ -1,3 +1,4 @@
+using LigaFutbol.Api.Exceptions;
 using LigaFutbol.Api.Models.DTOs;
 using LigaFutbol.Api.Models.Entities;
 using LigaFutbol.Api.Repositories.Interfaces;
@@ -27,6 +28,8 @@ public class PaisService(IPaisRepository paisRepository) : IPaisService
 
     public async Task<PaisDto> CreateAsync(CrearPaisDto dto)
     {
+        Validar(dto.Nombre, dto.UrlBandera);
+
         var pais = new Pais { Nombre = dto.Nombre, UrlBandera = dto.UrlBandera };
         await paisRepository.AddAsync(pais);
         await paisRepository.SaveChangesAsync();
@@ -37,6 +40,8 @@ public class PaisService(IPaisRepository paisRepository) : IPaisService
     {
         var pais = await paisRepository.GetByIdAsync(id);
         if (pais is null) return false;
+
+        Validar(dto.Nombre, dto.UrlBandera);
 
         pais.Nombre = dto.Nombre;
         pais.UrlBandera = dto.UrlBandera;
@@ -49,8 +54,23 @@ public class PaisService(IPaisRepository paisRepository) : IPaisService
         var pais = await paisRepository.GetByIdAsync(id);
         if (pais is null) return false;
 
+        if (pais.Ciudades.Count > 0)
+            throw new BusinessRuleException("No se puede eliminar el país porque tiene ciudades asociadas.");
+
+        if (pais.Ligas.Count > 0)
+            throw new BusinessRuleException("No se puede eliminar el país porque tiene ligas asociadas.");
+
         paisRepository.Remove(pais);
         return await paisRepository.SaveChangesAsync();
+    }
+
+    private static void Validar(string nombre, string urlBandera)
+    {
+        if (string.IsNullOrWhiteSpace(nombre))
+            throw new BusinessRuleException("El nombre del país es obligatorio.");
+
+        if (string.IsNullOrWhiteSpace(urlBandera))
+            throw new BusinessRuleException("La URL de la bandera es obligatoria.");
     }
 
     private static PaisDto ToDto(Pais pais) =>
