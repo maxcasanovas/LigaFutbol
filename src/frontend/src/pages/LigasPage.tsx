@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActionIcon, Alert, Button, Group, Loader, Modal, Stack, Table, Text, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Alert, Avatar, Button, Group, Loader, Modal, Stack, Table, Text, Title, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useAuth } from '../auth/useAuth';
 import { useLigas } from '../api/queries';
@@ -7,6 +7,7 @@ import { ApiError } from '../api/errors';
 import type { LigaDto } from '../api/types';
 import { useDeleteLiga } from '../features/ligas/mutations';
 import { LigaFormModal } from '../features/ligas/LigaFormModal';
+import { DetailDrawer } from '../components/DetailDrawer';
 
 export function LigasPage() {
   const { user } = useAuth();
@@ -18,6 +19,7 @@ export function LigasPage() {
   const [formOpened, setFormOpened] = useState(false);
   const [editingLiga, setEditingLiga] = useState<LigaDto | null>(null);
   const [deletingLiga, setDeletingLiga] = useState<LigaDto | null>(null);
+  const [viewingLiga, setViewingLiga] = useState<LigaDto | null>(null);
 
   const openCreateModal = () => {
     setEditingLiga(null);
@@ -76,12 +78,12 @@ export function LigasPage() {
         </Table.Thead>
         <Table.Tbody>
           {ligas.data?.map((liga) => (
-            <Table.Tr key={liga.id}>
+            <Table.Tr key={liga.id} onClick={() => setViewingLiga(liga)} style={{ cursor: 'pointer' }}>
               <Table.Td>{liga.nombre}</Table.Td>
               <Table.Td>{liga.pais}</Table.Td>
               <Table.Td>{liga.equipos.length}</Table.Td>
               {canWrite && (
-                <Table.Td>
+                <Table.Td onClick={(event) => event.stopPropagation()}>
                   <Group gap="xs" justify="flex-end">
                     <Tooltip label="Editar">
                       <ActionIcon
@@ -121,6 +123,36 @@ export function LigasPage() {
       </Table>
 
       <LigaFormModal opened={formOpened} onClose={() => setFormOpened(false)} liga={editingLiga} />
+
+      <DetailDrawer
+        opened={viewingLiga !== null}
+        onClose={() => setViewingLiga(null)}
+        title={`Equipos de ${viewingLiga?.nombre ?? ''}`}
+      >
+        <Stack gap={0}>
+          {viewingLiga?.equipos.length === 0 && (
+            <Text c="dimmed" size="sm">
+              Esta liga todavía no tiene equipos cargados.
+            </Text>
+          )}
+          {viewingLiga?.equipos.map((equipo, index) => (
+            <Group
+              key={equipo.id}
+              py="xs"
+              gap="sm"
+              style={{
+                borderBottom:
+                  viewingLiga.equipos.length - 1 === index ? undefined : '1px solid var(--mantine-color-gray-2)',
+              }}
+            >
+              <Avatar src={equipo.urlEscudo || null} size="sm" radius="xs">
+                🛡
+              </Avatar>
+              <Text size="sm">{equipo.nombre}</Text>
+            </Group>
+          ))}
+        </Stack>
+      </DetailDrawer>
 
       <Modal opened={deletingLiga !== null} onClose={() => setDeletingLiga(null)} title="Eliminar liga" radius="sm">
         <Stack gap="md">

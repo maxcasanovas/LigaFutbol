@@ -56,7 +56,9 @@ src/
 │   ├── tokenStorage.ts    # get/set/clear del JWT en localStorage
 │   ├── queries.ts         # hooks de lectura (usePaises, useCiudades, useLigas, useEquipos)
 │   ├── types.ts           # DTOs de la API (PaisDto, CiudadDto, LigaDto, EquipoDto, Auth*)
-│   └── config.ts          # API_BASE_URL
+│   ├── config.ts          # API_BASE_URL
+│   ├── flagCdn.ts         # cliente de flagcdn (autocompletado de bandera de País, ver más abajo)
+│   └── sportsDb.ts        # cliente de TheSportsDB (autocompletado de escudo de Equipo, ver más abajo)
 ├── auth/
 │   ├── authContext.instance.ts  # instancia del Context (sin componentes, para Fast Refresh)
 │   ├── AuthContext.tsx          # AuthProvider: sesión persistida en localStorage
@@ -104,6 +106,26 @@ Paleta y tipografía pensadas para una herramienta de registro/administración f
 | `/usuarios` | Solo Admin | Alta de usuarios con cualquier rol. No hay listado (la API no expone un `GET` de usuarios). |
 
 En las 4 pantallas CRUD, `Lector` ve la tabla pero sin botón de alta ni columnas de acciones.
+
+## Autocompletado de imágenes (bandera / escudo)
+
+Los formularios de País y Equipo sugieren la URL de la imagen a partir del nombre tipeado, en vez de pedirle al usuario que busque y pegue una URL a mano. Los dos comparten el mismo patrón de UI (debounce sobre el nombre, tarjeta de sugerencias debajo del campo, "descartado" atado al término buscado para que las sugerencias reaparezcan solas si el nombre cambia, y el campo de texto + preview en `Avatar` siempre visible al lado por si se prefiere pegar la URL a mano), pero cada uno consulta una fuente externa distinta porque cada API tiene una forma de búsqueda distinta.
+
+### Bandera de País — flagcdn
+
+flagcdn no tiene un endpoint de búsqueda por nombre: solo sirve banderas por código ISO 3166-1 alpha-2 (`https://flagcdn.com/<code>.svg`). Para poder "buscar por nombre" igual:
+
+- `src/api/flagCdn.ts` trae una única vez el listado completo de países (`https://flagcdn.com/es/codes.json`, nombres en español) y TanStack Query lo cachea con `staleTime: Infinity` — no tiene sentido repetir esa request.
+- `src/features/paises/CountryFlagSearch.tsx` filtra ese listado localmente en cada tecleo (debounce 300ms) y muestra hasta 5 coincidencias con su bandera; al elegir una, completa `urlBandera` con `flagCdnUrl(code)`.
+
+### Escudo de Equipo — TheSportsDB
+
+TheSportsDB sí expone búsqueda por nombre (`searchteams.php?t=<nombre>`), así que acá la búsqueda es remota en cada tecleo:
+
+- `src/api/sportsDb.ts` llama a ese endpoint por cada término debounced (450ms) y devuelve los equipos encontrados (`strBadge`, `strCountry`, `strLeague`).
+- `src/features/equipos/TeamBadgeSearch.tsx` muestra hasta 5 resultados con escudo, país y liga; al elegir uno, completa `urlEscudo` con `strBadge`.
+
+En ambos casos los clientes son independientes de `httpClient.ts` (sin JWT, no son la API propia) y cualquier error de red o de la API externa se traga silenciosamente: la búsqueda simplemente no muestra sugerencias, sin bloquear nunca el guardado del registro.
 
 ## Manejo de errores
 
