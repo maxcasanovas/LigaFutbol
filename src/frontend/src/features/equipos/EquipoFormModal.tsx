@@ -55,14 +55,27 @@ export function EquipoFormModal({ opened, onClose, equipo }: EquipoFormModalProp
   }, [opened, equipo]);
 
   const submitting = createEquipo.isPending || updateEquipo.isPending;
-  const ciudadOptions = (ciudades.data ?? []).map((ciudad) => ({
-    value: String(ciudad.id),
-    label: `${ciudad.nombre} (${ciudad.pais})`,
-  }));
-  const ligaOptions = (ligas.data ?? []).map((liga) => ({
-    value: String(liga.id),
-    label: `${liga.nombre} (${liga.pais})`,
-  }));
+
+  const ciudadesData = ciudades.data ?? [];
+  const ligasData = ligas.data ?? [];
+  const ciudadSeleccionada = ciudadesData.find((ciudad) => String(ciudad.id) === form.values.ciudadId);
+  const ligaSeleccionada = ligasData.find((liga) => String(liga.id) === form.values.ligaId);
+
+  // Filtro padre/hijo: elegir una ciudad o una liga acota las opciones del otro
+  // select al mismo país, para no poder armar una combinación invalida desde la UI.
+  const ciudadOptions = ciudadesData
+    .filter((ciudad) => !ligaSeleccionada || ciudad.paisId === ligaSeleccionada.paisId)
+    .map((ciudad) => ({ value: String(ciudad.id), label: `${ciudad.nombre} (${ciudad.pais})` }));
+  const ligaOptions = ligasData
+    .filter((liga) => !ciudadSeleccionada || liga.paisId === ciudadSeleccionada.paisId)
+    .map((liga) => ({ value: String(liga.id), label: `${liga.nombre} (${liga.pais})` }));
+
+  // Nota: como cada select ya filtra sus opciones segun el otro (arriba), no hace
+  // falta "limpiar" el otro campo ante un cambio: una combinacion de paises distintos
+  // nunca queda disponible para elegir en primer lugar. Solo convertimos null -> ''
+  // porque el tipo de EquipoFormValues usa string (para el clearable de Select).
+  const handleCiudadChange = (value: string | null) => form.setFieldValue('ciudadId', value ?? '');
+  const handleLigaChange = (value: string | null) => form.setFieldValue('ligaId', value ?? '');
 
   const handleSubmit = async (values: EquipoFormValues) => {
     if (values.ciudadId.length === 0 || values.ligaId.length === 0) return;
@@ -117,14 +130,18 @@ export function EquipoFormModal({ opened, onClose, equipo }: EquipoFormModalProp
             placeholder="Seleccioná una ciudad"
             data={ciudadOptions}
             searchable
+            clearable
             {...form.getInputProps('ciudadId')}
+            onChange={handleCiudadChange}
           />
           <Select
             label="Liga"
             placeholder="Seleccioná una liga"
             data={ligaOptions}
             searchable
+            clearable
             {...form.getInputProps('ligaId')}
+            onChange={handleLigaChange}
           />
           <Group justify="flex-end" mt="xs">
             <Button variant="default" type="button" onClick={onClose}>
