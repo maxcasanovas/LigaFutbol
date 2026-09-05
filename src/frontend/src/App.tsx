@@ -6,6 +6,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { PaisesPage } from './pages/PaisesPage';
 import { CiudadesPage } from './pages/CiudadesPage';
 import { LigasPage } from './pages/LigasPage';
+import { EquiposPage } from './pages/EquiposPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
           <Route path="/paises" element={<PaisesPage />} />
           <Route path="/ciudades" element={<CiudadesPage />} />
           <Route path="/ligas" element={<LigasPage />} />
-          <Route path="/equipos" element={<PlaceholderPage title="Equipos" />} />
+          <Route path="/equipos" element={<EquiposPage />} />
           <Route path="/usuarios" element={<PlaceholderPage title="Usuarios" />} />
         </Route>
       </Route>
