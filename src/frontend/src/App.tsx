@@ -1,14 +1,23 @@
 import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './auth/ProtectedRoute';
+import { AppLayout } from './layout/AppLayout';
 import { LoginPage } from './pages/LoginPage';
-import { SetupStatusPage } from './pages/SetupStatusPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { PlaceholderPage } from './pages/PlaceholderPage';
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<SetupStatusPage />} />
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/paises" element={<PlaceholderPage title="Países" />} />
+          <Route path="/ciudades" element={<PlaceholderPage title="Ciudades" />} />
+          <Route path="/ligas" element={<PlaceholderPage title="Ligas" />} />
+          <Route path="/equipos" element={<PlaceholderPage title="Equipos" />} />
+          <Route path="/usuarios" element={<PlaceholderPage title="Usuarios" />} />
+        </Route>
       </Route>
     </Routes>
   );
