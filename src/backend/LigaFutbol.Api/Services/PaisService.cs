@@ -19,6 +19,12 @@ public class PaisService(IPaisRepository paisRepository) : IPaisService
         return pais is null ? null : ToDto(pais);
     }
 
+    public async Task<PaisDto?> GetByNombreAsync(string nombre)
+    {
+        var pais = await paisRepository.GetByNombreAsync(nombre);
+        return pais is null ? null : ToDto(pais);
+    }
+
     public async Task<PaisDto> CreateAsync(CrearPaisDto dto)
     {
         var pais = new Pais { Nombre = dto.Nombre, UrlBandera = dto.UrlBandera };
