@@ -9,6 +9,7 @@ public class LigaFutbolDbContext(DbContextOptions<LigaFutbolDbContext> options) 
     public DbSet<Ciudad> Ciudades => Set<Ciudad>();
     public DbSet<Liga> Ligas => Set<Liga>();
     public DbSet<Equipo> Equipos => Set<Equipo>();
+    public DbSet<Usuario> Usuarios => Set<Usuario>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,6 +53,15 @@ public class LigaFutbolDbContext(DbContextOptions<LigaFutbolDbContext> options) 
                 .WithMany(l => l.Equipos)
                 .HasForeignKey(e => e.LigaId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.Property(u => u.Email).IsRequired().HasMaxLength(256);
+            entity.Property(u => u.PasswordHash).IsRequired();
+            entity.Property(u => u.Rol).IsRequired().HasConversion<string>().HasMaxLength(20);
+
+            entity.HasIndex(u => u.Email).IsUnique();
         });
 
         base.OnModelCreating(modelBuilder);
