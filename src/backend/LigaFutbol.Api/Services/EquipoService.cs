@@ -1,3 +1,4 @@
+using LigaFutbol.Api.Exceptions;
 using LigaFutbol.Api.Models.DTOs;
 using LigaFutbol.Api.Models.Entities;
 using LigaFutbol.Api.Repositories.Interfaces;
@@ -5,7 +6,10 @@ using LigaFutbol.Api.Services.Interfaces;
 
 namespace LigaFutbol.Api.Services;
 
-public class EquipoService(IEquipoRepository equipoRepository) : IEquipoService
+public class EquipoService(
+    IEquipoRepository equipoRepository,
+    ICiudadRepository ciudadRepository,
+    ILigaRepository ligaRepository) : IEquipoService
 {
     public async Task<IEnumerable<EquipoDto>> GetAllAsync()
     {
@@ -21,6 +25,8 @@ public class EquipoService(IEquipoRepository equipoRepository) : IEquipoService
 
     public async Task<EquipoDto> CreateAsync(CrearEquipoDto dto)
     {
+        await ValidarAsync(dto.Nombre, dto.CiudadId, dto.LigaId);
+
         var equipo = new Equipo { Nombre = dto.Nombre, UrlEscudo = dto.UrlEscudo, CiudadId = dto.CiudadId, LigaId = dto.LigaId };
         await equipoRepository.AddAsync(equipo);
         await equipoRepository.SaveChangesAsync();
@@ -32,6 +38,8 @@ public class EquipoService(IEquipoRepository equipoRepository) : IEquipoService
     {
         var equipo = await equipoRepository.GetByIdAsync(id);
         if (equipo is null) return false;
+
+        await ValidarAsync(dto.Nombre, dto.CiudadId, dto.LigaId);
 
         equipo.Nombre = dto.Nombre;
         equipo.UrlEscudo = dto.UrlEscudo;
@@ -48,6 +56,23 @@ public class EquipoService(IEquipoRepository equipoRepository) : IEquipoService
 
         equipoRepository.Remove(equipo);
         return await equipoRepository.SaveChangesAsync();
+    }
+
+    private async Task ValidarAsync(string nombre, int ciudadId, int ligaId)
+    {
+        if (string.IsNullOrWhiteSpace(nombre))
+            throw new BusinessRuleException("El nombre del equipo es obligatorio.");
+
+        var ciudad = await ciudadRepository.GetByIdAsync(ciudadId);
+        if (ciudad is null)
+            throw new BusinessRuleException("La ciudad indicada no existe.");
+
+        var liga = await ligaRepository.GetByIdAsync(ligaId);
+        if (liga is null)
+            throw new BusinessRuleException("La liga indicada no existe.");
+
+        if (ciudad.PaisId != liga.PaisId)
+            throw new BusinessRuleException("La ciudad y la liga del equipo deben pertenecer al mismo país.");
     }
 
     private static EquipoDto ToDto(Equipo equipo) =>

@@ -1,3 +1,4 @@
+using LigaFutbol.Api.Exceptions;
 using LigaFutbol.Api.Models.DTOs;
 using LigaFutbol.Api.Security;
 using LigaFutbol.Api.Services.Interfaces;
@@ -27,16 +28,30 @@ public class EquiposController(IEquipoService equipoService) : ControllerBase
     [Authorize(Policy = Policies.Escritura)]
     public async Task<ActionResult<EquipoDto>> Create(CrearEquipoDto dto)
     {
-        var equipo = await equipoService.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = equipo.Id }, equipo);
+        try
+        {
+            var equipo = await equipoService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = equipo.Id }, equipo);
+        }
+        catch (BusinessRuleException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id:int}")]
     [Authorize(Policy = Policies.Escritura)]
     public async Task<IActionResult> Update(int id, ActualizarEquipoDto dto)
     {
-        var actualizado = await equipoService.UpdateAsync(id, dto);
-        return actualizado ? NoContent() : NotFound();
+        try
+        {
+            var actualizado = await equipoService.UpdateAsync(id, dto);
+            return actualizado ? NoContent() : NotFound();
+        }
+        catch (BusinessRuleException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("{id:int}")]
