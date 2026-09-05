@@ -7,6 +7,7 @@ import { ApiError } from '../api/errors';
 import type { PaisDto } from '../api/types';
 import { useDeletePais } from '../features/paises/mutations';
 import { PaisFormModal } from '../features/paises/PaisFormModal';
+import { DetailDrawer } from '../components/DetailDrawer';
 
 export function PaisesPage() {
   const { user } = useAuth();
@@ -18,6 +19,7 @@ export function PaisesPage() {
   const [formOpened, setFormOpened] = useState(false);
   const [editingPais, setEditingPais] = useState<PaisDto | null>(null);
   const [deletingPais, setDeletingPais] = useState<PaisDto | null>(null);
+  const [viewingPais, setViewingPais] = useState<PaisDto | null>(null);
 
   const openCreateModal = () => {
     setEditingPais(null);
@@ -76,14 +78,14 @@ export function PaisesPage() {
         </Table.Thead>
         <Table.Tbody>
           {paises.data?.map((pais) => (
-            <Table.Tr key={pais.id}>
+            <Table.Tr key={pais.id} onClick={() => setViewingPais(pais)} style={{ cursor: 'pointer' }}>
               <Table.Td w={40}>
                 <Avatar src={pais.urlBandera} size="sm" radius="xs" />
               </Table.Td>
               <Table.Td>{pais.nombre}</Table.Td>
               <Table.Td>{pais.ciudades.length}</Table.Td>
               {canWrite && (
-                <Table.Td>
+                <Table.Td onClick={(event) => event.stopPropagation()}>
                   <Group gap="xs" justify="flex-end">
                     <Tooltip label="Editar">
                       <ActionIcon
@@ -123,6 +125,32 @@ export function PaisesPage() {
       </Table>
 
       <PaisFormModal opened={formOpened} onClose={() => setFormOpened(false)} pais={editingPais} />
+
+      <DetailDrawer
+        opened={viewingPais !== null}
+        onClose={() => setViewingPais(null)}
+        title={`Ciudades de ${viewingPais?.nombre ?? ''}`}
+      >
+        <Stack gap={0}>
+          {viewingPais?.ciudades.length === 0 && (
+            <Text c="dimmed" size="sm">
+              Este país todavía no tiene ciudades cargadas.
+            </Text>
+          )}
+          {viewingPais?.ciudades.map((ciudad, index) => (
+            <Group
+              key={ciudad.id}
+              py="xs"
+              style={{
+                borderBottom:
+                  viewingPais.ciudades.length - 1 === index ? undefined : '1px solid var(--mantine-color-gray-2)',
+              }}
+            >
+              <Text size="sm">{ciudad.nombre}</Text>
+            </Group>
+          ))}
+        </Stack>
+      </DetailDrawer>
 
       <Modal opened={deletingPais !== null} onClose={() => setDeletingPais(null)} title="Eliminar país" radius="sm">
         <Stack gap="md">
