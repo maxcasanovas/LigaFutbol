@@ -1,6 +1,7 @@
 using System.Text;
 using LigaFutbol.Api.Data;
 using LigaFutbol.Api.Extensions;
+using LigaFutbol.Api.Models.Entities;
 using LigaFutbol.Api.Repositories;
 using LigaFutbol.Api.Repositories.Interfaces;
 using LigaFutbol.Api.Security;
@@ -63,7 +64,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(Policies.Lectura, policy => policy.RequireRole(
+        nameof(RolUsuario.Admin), nameof(RolUsuario.Editor), nameof(RolUsuario.Lector)))
+    .AddPolicy(Policies.Escritura, policy => policy.RequireRole(
+        nameof(RolUsuario.Admin), nameof(RolUsuario.Editor)))
+    .AddPolicy(Policies.GestionUsuarios, policy => policy.RequireRole(
+        nameof(RolUsuario.Admin)));
 
 var app = builder.Build();
 

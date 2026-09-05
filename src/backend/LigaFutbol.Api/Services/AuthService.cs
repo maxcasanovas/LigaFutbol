@@ -11,6 +11,18 @@ public class AuthService(IUsuarioRepository usuarioRepository, JwtTokenGenerator
 {
     public async Task<AuthResponseDto> RegistrarAsync(RegistrarUsuarioDto dto)
     {
+        if (!string.Equals(dto.Rol, nameof(RolUsuario.Lector), StringComparison.OrdinalIgnoreCase))
+            throw new BusinessRuleException(
+                "El autoregistro solo permite el rol Lector. Para crear usuarios Editor o Admin, un administrador debe usar /api/auth/usuarios.");
+
+        return await CrearUsuarioInternoAsync(dto);
+    }
+
+    public async Task<AuthResponseDto> CrearUsuarioAsync(RegistrarUsuarioDto dto) =>
+        await CrearUsuarioInternoAsync(dto);
+
+    private async Task<AuthResponseDto> CrearUsuarioInternoAsync(RegistrarUsuarioDto dto)
+    {
         if (string.IsNullOrWhiteSpace(dto.Password) || dto.Password.Length < 6)
             throw new BusinessRuleException("La contraseña debe tener al menos 6 caracteres.");
 
