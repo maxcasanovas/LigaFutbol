@@ -21,7 +21,7 @@ public class EquipoService(IEquipoRepository equipoRepository) : IEquipoService
 
     public async Task<EquipoDto> CreateAsync(CrearEquipoDto dto)
     {
-        var equipo = new Equipo { Nombre = dto.Nombre, UrlEscudo = dto.UrlEscudo, CiudadId = dto.CiudadId };
+        var equipo = new Equipo { Nombre = dto.Nombre, UrlEscudo = dto.UrlEscudo, CiudadId = dto.CiudadId, LigaId = dto.LigaId };
         await equipoRepository.AddAsync(equipo);
         await equipoRepository.SaveChangesAsync();
         equipo = await equipoRepository.GetByIdAsync(equipo.Id);
@@ -36,6 +36,7 @@ public class EquipoService(IEquipoRepository equipoRepository) : IEquipoService
         equipo.Nombre = dto.Nombre;
         equipo.UrlEscudo = dto.UrlEscudo;
         equipo.CiudadId = dto.CiudadId;
+        equipo.LigaId = dto.LigaId;
         equipoRepository.Update(equipo);
         return await equipoRepository.SaveChangesAsync();
     }
@@ -50,5 +51,6 @@ public class EquipoService(IEquipoRepository equipoRepository) : IEquipoService
     }
 
     private static EquipoDto ToDto(Equipo equipo) =>
-        new(equipo.Id, equipo.Nombre, equipo.UrlEscudo, equipo.CiudadId, equipo.Ciudad.Nombre, equipo.FechaCreacion);
+        new(equipo.Id, equipo.Nombre, equipo.UrlEscudo, equipo.CiudadId, equipo.Ciudad.Nombre,
+            equipo.LigaId, equipo.Liga.Nombre, equipo.FechaCreacion);
 }

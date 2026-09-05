@@ -9,4 +9,7 @@ public class Equipo
 
     public int CiudadId { get; set; }
     public Ciudad Ciudad { get; set; } = null!;
+
+    public int LigaId { get; set; }
+    public Liga Liga { get; set; } = null!;
 }
