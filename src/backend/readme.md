@@ -139,6 +139,10 @@ Roles disponibles (`RolUsuario`): **Admin**, **Editor**, **Lector**.
 
 Todos los endpoints de datos requieren un JWT válido (header `Authorization: Bearer <token>`); no hay endpoints públicos de lectura.
 
+### Probar endpoints protegidos en Scalar
+
+El documento OpenAPI declara el security scheme `Bearer`, así que Scalar (`http://localhost:5080/scalar/v1`) muestra un botón **Authorize** (o el ícono de candado en cada endpoint protegido): pegá ahí el token devuelto por `/api/auth/login` (sin el prefijo `Bearer `, Scalar lo agrega solo) y se aplica automáticamente a todos los requests de prueba, sin tener que repetir el header a mano en cada endpoint. Los endpoints públicos (`register`, `login`) no piden token.
+
 ### Endpoints de autenticación
 
 | Método | Ruta | Acceso | Descripción |
