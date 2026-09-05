@@ -3,6 +3,7 @@ import { ProtectedRoute } from './auth/ProtectedRoute';
 import { AppLayout } from './layout/AppLayout';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { PaisesPage } from './pages/PaisesPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 function App() {
@@ -12,7 +13,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<DashboardPage />} />
-          <Route path="/paises" element={<PlaceholderPage title="Países" />} />
+          <Route path="/paises" element={<PaisesPage />} />
           <Route path="/ciudades" element={<PlaceholderPage title="Ciudades" />} />
           <Route path="/ligas" element={<PlaceholderPage title="Ligas" />} />
           <Route path="/equipos" element={<PlaceholderPage title="Equipos" />} />
