@@ -1,27 +1,14 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { api } from '../api/httpClient';
-import type { AuthResponseDto, Rol } from '../api/types';
+import type { AuthResponseDto } from '../api/types';
 import { clearToken, getToken, setToken as persistToken } from '../api/tokenStorage';
-
-export interface AuthUser {
-  email: string;
-  rol: Rol;
-}
+import { AuthContext, type AuthUser } from './authContext.instance';
 
 interface StoredUser extends AuthUser {
   expiraEn: string;
 }
 
 const USER_KEY = 'ligafutbol_user';
-
-interface AuthContextValue {
-  user: AuthUser | null;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null);
 
 function readStoredUser(): StoredUser | null {
   const raw = localStorage.getItem(USER_KEY);
@@ -36,20 +23,18 @@ function readStoredUser(): StoredUser | null {
   }
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+function resolveInitialUser(): AuthUser | null {
+  const stored = readStoredUser();
+  if (stored && getToken()) {
+    return { email: stored.email, rol: stored.rol };
+  }
+  clearToken();
+  localStorage.removeItem(USER_KEY);
+  return null;
+}
 
-  useEffect(() => {
-    const stored = readStoredUser();
-    if (stored && getToken()) {
-      setUser({ email: stored.email, rol: stored.rol });
-    } else {
-      clearToken();
-      localStorage.removeItem(USER_KEY);
-    }
-    setIsLoading(false);
-  }, []);
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(resolveInitialUser);
 
   const login = async (email: string, password: string) => {
     const response = await api.post<AuthResponseDto>('/api/auth/login', { email, password });
@@ -65,15 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
-  const value = useMemo(() => ({ user, isLoading, login, logout }), [user, isLoading]);
+  const value = useMemo(() => ({ user, login, logout }), [user]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error('useAuth debe usarse dentro de un AuthProvider.');
-  }
-  return ctx;
 }
